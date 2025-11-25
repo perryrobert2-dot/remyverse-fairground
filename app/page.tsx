@@ -73,18 +73,12 @@ export default function Home() {
            <div className="bg-[#F2EFE9] border-2 border-slate-900 rounded-lg p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]">
               <div className="shrink-0 mx-auto md:mx-0">
                  <div className="w-24 h-24 rounded-full border-2 border-slate-900 overflow-hidden bg-white shadow-sm">
-                    {/* Ensure professor.png exists in /public/images/ */}
-                    <img 
-                       src="/images/professor.png" 
-                       alt="Professor Remy" 
-                       className="w-full h-full object-cover"
-                    />
+                    <img src="/images/professor.png" alt="Professor Remy" className="w-full h-full object-cover"/>
                  </div>
                  <p className="text-center text-[10px] font-bold uppercase tracking-widest mt-2 text-slate-500">
                     Prof. Remy
                  </p>
               </div>
-
               <div className="flex-1 text-center md:text-left">
                  <h3 className="text-xl font-bold text-slate-900 mb-2 font-serif">
                     {issueData.professor.title}
@@ -96,6 +90,17 @@ export default function Home() {
            </div>
         </section>
 
+        {/* --- THE MYSTIC HOROSCOPE (NEW) --- */}
+        {issueData.mystic && (
+          <section className="max-w-lg mx-auto bg-slate-900 text-orange-100 p-6 rounded-lg text-center mb-16 shadow-lg">
+             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300 mb-2">The Mystic Foresees</h3>
+             <h4 className="text-2xl font-black mb-4">{issueData.mystic.sign}</h4>
+             <p className="font-serif italic text-lg leading-relaxed opacity-90">
+                "{issueData.mystic.prediction}"
+             </p>
+          </section>
+        )}
+
         {/* --- THE BARKER (CLASSIFIEDS) --- */}
         <section className="max-w-4xl mx-auto border-t-4 border-double border-slate-300 pt-12">
             <h3 className="text-center text-3xl font-black uppercase text-slate-900 mb-8 tracking-tighter">
@@ -103,7 +108,6 @@ export default function Home() {
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Safe check: if classifieds exist, map them. If not, show nothing. */}
                 {issueData.classifieds && issueData.classifieds.map((ad, index) => (
                     <div key={index} className="bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
                         <p className="font-mono text-xs text-slate-400 mb-2 uppercase tracking-widest">
