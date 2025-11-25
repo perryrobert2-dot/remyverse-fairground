@@ -48,9 +48,8 @@ export default function Home() {
           </p>
         </article>
 
-        {/* --- MAIN ARTICLE BODY (NEW) --- */}
+        {/* --- MAIN ARTICLE BODY --- */}
         <article className="max-w-2xl mx-auto mb-16 font-serif text-lg leading-relaxed text-slate-800">
-           {/* This splits the text by newlines so we get actual paragraphs */}
            {issueData.body && issueData.body.split('\n').map((paragraph, index) => (
              paragraph.trim() !== "" && (
                <p key={index} className="mb-6">
@@ -63,17 +62,42 @@ export default function Home() {
            </div>
         </article>
 
-        {/* --- THE PROFESSOR'S CORNER --- */}
-        <section className="max-w-2xl mx-auto bg-[#F2EFE9] border-l-4 border-slate-400 p-8 rounded-r-lg">
-           <div className="flex items-start gap-4">
-              <div className="flex-1">
-                 <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">
-                    {issueData.professor.title}
-                 </h3>
-                 <p className="text-lg font-serif text-slate-800 leading-relaxed">
-                    {issueData.professor.content}
+        {/* --- THE PROFESSOR'S CORNER (UPDATED WITH PORTRAIT) --- */}
+        <section className="max-w-2xl mx-auto mt-16">
+           {/* The Header Tab */}
+           <div className="flex items-center gap-3 mb-4">
+              <div className="h-[2px] bg-slate-300 flex-1"></div>
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-400">From The Archives</span>
+              <div className="h-[2px] bg-slate-300 flex-1"></div>
+           </div>
+
+           {/* The Card */}
+           <div className="bg-[#F2EFE9] border-2 border-slate-900 rounded-lg p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]">
+              
+              {/* The Vignette (Portrait) */}
+              <div className="shrink-0 mx-auto md:mx-0">
+                 <div className="w-24 h-24 rounded-full border-2 border-slate-900 overflow-hidden bg-white shadow-sm">
+                    <img 
+                       src="/images/professor.png" 
+                       alt="Professor Remy" 
+                       className="w-full h-full object-cover"
+                    />
+                 </div>
+                 <p className="text-center text-[10px] font-bold uppercase tracking-widest mt-2 text-slate-500">
+                    Prof. Remy
                  </p>
               </div>
+
+              {/* The Content */}
+              <div className="flex-1 text-center md:text-left">
+                 <h3 className="text-xl font-bold text-slate-900 mb-2 font-serif">
+                    {issueData.professor.title}
+                 </h3>
+                 <p className="text-md text-slate-700 leading-relaxed font-serif italic">
+                    "{issueData.professor.content}"
+                 </p>
+              </div>
+
            </div>
         </section>
 
