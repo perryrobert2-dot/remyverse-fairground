@@ -62,21 +62,18 @@ export default function Home() {
            </div>
         </article>
 
-        {/* --- THE PROFESSOR'S CORNER (UPDATED WITH PORTRAIT) --- */}
-        <section className="max-w-2xl mx-auto mt-16">
-           {/* The Header Tab */}
+        {/* --- THE PROFESSOR'S CORNER --- */}
+        <section className="max-w-2xl mx-auto mt-16 mb-20">
            <div className="flex items-center gap-3 mb-4">
               <div className="h-[2px] bg-slate-300 flex-1"></div>
               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">From The Archives</span>
               <div className="h-[2px] bg-slate-300 flex-1"></div>
            </div>
 
-           {/* The Card */}
            <div className="bg-[#F2EFE9] border-2 border-slate-900 rounded-lg p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]">
-              
-              {/* The Vignette (Portrait) */}
               <div className="shrink-0 mx-auto md:mx-0">
                  <div className="w-24 h-24 rounded-full border-2 border-slate-900 overflow-hidden bg-white shadow-sm">
+                    {/* Ensure professor.png exists in /public/images/ */}
                     <img 
                        src="/images/professor.png" 
                        alt="Professor Remy" 
@@ -88,7 +85,6 @@ export default function Home() {
                  </p>
               </div>
 
-              {/* The Content */}
               <div className="flex-1 text-center md:text-left">
                  <h3 className="text-xl font-bold text-slate-900 mb-2 font-serif">
                     {issueData.professor.title}
@@ -97,8 +93,28 @@ export default function Home() {
                     "{issueData.professor.content}"
                  </p>
               </div>
-
            </div>
+        </section>
+
+        {/* --- THE BARKER (CLASSIFIEDS) --- */}
+        <section className="max-w-4xl mx-auto border-t-4 border-double border-slate-300 pt-12">
+            <h3 className="text-center text-3xl font-black uppercase text-slate-900 mb-8 tracking-tighter">
+                The Barker Classifieds
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Safe check: if classifieds exist, map them. If not, show nothing. */}
+                {issueData.classifieds && issueData.classifieds.map((ad, index) => (
+                    <div key={index} className="bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                        <p className="font-mono text-xs text-slate-400 mb-2 uppercase tracking-widest">
+                            Ad Ref: #{1000 + index}
+                        </p>
+                        <p className="font-serif text-sm leading-relaxed text-slate-800">
+                            {ad}
+                        </p>
+                    </div>
+                ))}
+            </div>
         </section>
 
       </div>
