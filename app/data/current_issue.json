@@ -1,8 +1,12 @@
 {
   "issueNumber": 1,
   "date": "25 November 2025",
-  "headline": "Bush Whackers",
-  "subtext": "Council's secret plan to boost revenue revealed.",
-  "category": "INFRASTRUCTURE",
-  "imagePath": "/images/latest_issue.jpg"
+  "headline": "Bus Lane Bandits",
+  "subtext": "Council's cronies cash in on tardy transit.",
+  "category": "WASTE, CORRUPTION",
+  "imagePath": "/images/latest_issue.jpg",
+  "professor": {
+    "title": "From The Archives",
+    "content": "The historical event we delve into today hails from the quaint coastal suburb of Manly. In the early twentieth century, an unusual phenomenon perplexed both locals and scientists - a peculiar species of seagulls referred to as 'Bin Chickens'. These birds were not your ordinary seagulls; they exhibited an extraordinary penchant for scavenging food waste from dustbins. This led to a fierce rivalry with another avian population, culminating in what is now infamously known as The Great Bin Chicken War of 1932. Despite its humorous name, the conflict spurred significant advancements in urban bird management and waste disposal systems."
+  }
 }
