@@ -36,7 +36,7 @@ export default function Home() {
         </section>
 
         {/* HEADLINE SECTION */}
-        <article className="max-w-2xl mx-auto text-center mb-16">
+        <article className="max-w-2xl mx-auto text-center mb-12">
           <span className="inline-block bg-slate-900 text-white text-xs font-bold px-3 py-1 mb-4 rounded-full uppercase tracking-wider">
             {issueData.category}
           </span>
@@ -46,6 +46,21 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-slate-600 font-serif italic leading-relaxed">
             "{issueData.subtext}"
           </p>
+        </article>
+
+        {/* --- MAIN ARTICLE BODY (NEW) --- */}
+        <article className="max-w-2xl mx-auto mb-16 font-serif text-lg leading-relaxed text-slate-800">
+           {/* This splits the text by newlines so we get actual paragraphs */}
+           {issueData.body && issueData.body.split('\n').map((paragraph, index) => (
+             paragraph.trim() !== "" && (
+               <p key={index} className="mb-6">
+                 {paragraph}
+               </p>
+             )
+           ))}
+           <div className="flex justify-center mt-8">
+             <span className="text-slate-400 tracking-widest text-xs uppercase">*** End of Report ***</span>
+           </div>
         </article>
 
         {/* --- THE PROFESSOR'S CORNER --- */}
