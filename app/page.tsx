@@ -47,8 +47,8 @@ export default function Home() {
                         <img src="/images/professor.png" alt="Professor Remy" className="w-full h-full object-cover"/>
                     </div>
                     <div>
-                        <h3 className="font-bold text-slate-900 uppercase tracking-wider text-sm">University of Innaloo</h3>
-                        <p className="text-xs text-slate-500 font-mono">DEPT. OF PHILOSOPHY</p>
+                        <h3 className="font-bold text-slate-900 uppercase tracking-wider text-sm">From The Archives</h3>
+                        <p className="text-xs text-slate-500 font-mono">PROF. REMY</p>
                     </div>
                 </div>
                 <div className="flex-1">
