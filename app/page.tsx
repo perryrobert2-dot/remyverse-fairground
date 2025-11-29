@@ -15,14 +15,15 @@ export default function Home() {
   useEffect(() => { fetch('/data/current_issue.json').then((res) => res.json()).then((data) => setData(data)); }, []);
   if (!data) return <div className="min-h-screen bg-[#8b1c1c] p-20 text-center font-mono text-[#f4e4bc] animate-pulse">Waiting for the Night Shift...</div>;
 
-  const editorial = data.editorial || { title: "Loading...", teaser: "..." };
   const arts = data.arts || { title: "Loading...", rating: "?" };
   const pitd = data.pitd || { title: "Under Construction" };
   const blotter = data.blotter || { incident: "Quiet Night" };
   const advice = data.advice || { main_q: "..." };
   const firstLetter = data.letters?.[0] || {};
   const mailTeaser = firstLetter.body ? firstLetter.body : (firstLetter.topic || "Check the mailbag.");
-  const pubDate = data.meta?.generated_at ? new Date(data.meta.generated_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Today";
+  
+  // DATE FORMATTER
+  const pubDate = data.meta?.generated_at ? new Date(data.meta.generated_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : "Today";
 
   return (
     <main className="min-h-screen bg-[#8b1c1c] p-4 md:p-8 font-sans selection:bg-yellow-300">
@@ -37,19 +38,21 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
 
-        {/* EDITORIAL */}
+        {/* EDITORIAL - HARDCODED MINIMALIST */}
         <Link href="/editorial" className="md:col-span-2 group">
             <article className="bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)] border-4 border-black h-[500px] flex flex-col group-hover:-translate-y-2 transition-transform relative overflow-hidden">
-                <div className="h-72 relative bg-[#e3e3e3] border-b-4 border-black"><Image src="/personas/professor.png" alt="Editor" fill className="object-cover object-top" /></div>
-                <div className="p-6 flex flex-col flex-1">
-                    {/* EDITORIAL HEADLINE: ALLOW NEWLINES FOR BULLETS */}
-                    <h2 className="text-xl font-black leading-tight mb-2 text-black group-hover:text-red-700 transition-colors whitespace-pre-line">{clean(editorial.title)}</h2>
-                    <p className="font-serif text-sm text-black line-clamp-2 mb-4">{clean(editorial.teaser)}</p>
-                    
-                    {/* DATE AT BOTTOM */}
-                    <div className="mt-auto pt-4 border-t border-slate-200">
-                        <span className="font-sans text-xs font-bold uppercase tracking-widest text-slate-400">{pubDate}</span>
-                    </div>
+                <div className="h-72 relative bg-[#e3e3e3] border-b-4 border-black">
+                    <Image src="/personas/professor.png" alt="Editor" fill className="object-cover object-top" />
+                </div>
+                <div className="p-6 flex flex-col flex-1 justify-center">
+                    {/* HARDCODED TITLE */}
+                    <h2 className="text-3xl font-black leading-tight mb-4 text-black group-hover:text-red-700 transition-colors">
+                        News For {pubDate}
+                    </h2>
+                    {/* STATIC TEASER */}
+                    <p className="font-serif text-base text-black italic">
+                        A wealth of news awaits you today.
+                    </p>
                 </div>
             </article>
         </Link>
