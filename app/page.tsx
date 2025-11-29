@@ -20,11 +20,8 @@ export default function Home() {
   const pitd = data.pitd || { title: "Under Construction" };
   const blotter = data.blotter || { incident: "Quiet Night" };
   const advice = data.advice || { main_q: "..." };
-  
-  // ROBUST TEASER LOGIC
   const firstLetter = data.letters?.[0] || {};
-  // Prefer body, fallback to topic, fallback to default
-  const mailTeaser = firstLetter.body ? firstLetter.body : (firstLetter.topic || "Check the mailbag for local complaints.");
+  const mailTeaser = firstLetter.body ? firstLetter.body : (firstLetter.topic || "Check the mailbag.");
 
   return (
     <main className="min-h-screen bg-[#8b1c1c] p-4 md:p-8 font-sans selection:bg-yellow-300">
@@ -42,8 +39,10 @@ export default function Home() {
         {/* EDITORIAL */}
         <Link href="/editorial" className="md:col-span-2 group">
             <article className="bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)] border-4 border-black h-[500px] flex flex-col group-hover:-translate-y-2 transition-transform relative overflow-hidden">
-                <div className="h-64 relative bg-slate-200 border-b-4 border-black"><Image src="/personas/professor.png" alt="Editor" fill className="object-contain p-2" /></div>
+                {/* Made image area slightly larger and background cleaner */}
+                <div className="h-72 relative bg-[#e3e3e3] border-b-4 border-black"><Image src="/personas/professor.png" alt="Editor" fill className="object-cover object-top" /></div>
                 <div className="p-6 flex flex-col flex-1">
+                    {/* Increased line clamp for title */}
                     <h2 className="text-2xl font-black leading-tight mb-2 text-black group-hover:text-red-700 transition-colors line-clamp-3">{clean(editorial.title)}</h2>
                     <p className="font-serif text-sm text-black line-clamp-3">{clean(editorial.teaser)}</p>
                 </div>
@@ -76,10 +75,7 @@ export default function Home() {
             <div className="bg-[#f0e6d2] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)] border-4 border-black p-5 h-64 flex flex-col group-hover:-rotate-1 transition-transform relative overflow-hidden">
                  <div className="absolute top-0 right-0 w-16 h-16 bg-red-600 text-white flex items-center justify-center font-black text-xs rotate-45 translate-x-6 -translate-y-6 shadow-md">NEW</div>
                  <div className="flex items-center gap-3 mb-3"><div className="w-10 h-10 relative rounded-full border-2 border-black bg-white overflow-hidden"><Image src="/personas/mail_carrier.jpg" alt="Mail" fill className="object-cover" /></div><h3 className="font-black text-lg uppercase underline decoration-wavy text-black">Mailbag</h3></div>
-                 
-                 {/* DYNAMIC TEASER */}
                  <p className="text-sm font-serif italic text-black line-clamp-3">"{clean(mailTeaser, 100)}"</p>
-                 
                  <div className="mt-auto text-xs font-bold text-red-700 uppercase">Read Letters →</div>
             </div>
         </Link>
