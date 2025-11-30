@@ -15,7 +15,6 @@ export default function Home() {
   useEffect(() => { fetch('/data/current_issue.json').then((res) => res.json()).then((data) => setData(data)); }, []);
   if (!data) return <div className="min-h-screen bg-[#8b1c1c] p-20 text-center font-mono text-[#f4e4bc] animate-pulse">Waiting for the Night Shift...</div>;
 
-  const editorial = data.editorial || { title: "News For You", teaser: "A wealth of news awaits you today." };
   const arts = data.arts || { title: "Loading...", rating: "?" };
   const pitd = data.pitd || { title: "Under Construction" };
   const blotter = data.blotter || { incident: "Quiet Night" };
@@ -39,18 +38,20 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
 
-        {/* EDITORIAL */}
+        {/* EDITORIAL - HARDCODED MINIMALIST */}
         <Link href="/editorial" className="md:col-span-2 group">
             <article className="bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)] border-4 border-black h-[500px] flex flex-col group-hover:-translate-y-2 transition-transform relative overflow-hidden">
                 <div className="h-72 relative bg-[#e3e3e3] border-b-4 border-black">
                     <Image src="/personas/professor.png" alt="Editor" fill className="object-cover object-top" />
                 </div>
                 <div className="p-6 flex flex-col flex-1 justify-center">
-                    <h2 className="text-3xl font-black leading-tight mb-4 text-black group-hover:text-red-700 transition-colors line-clamp-3">
-                        {clean(editorial.title)}
+                    {/* HARDCODED TITLE */}
+                    <h2 className="text-3xl font-black leading-tight mb-4 text-black group-hover:text-red-700 transition-colors">
+                        News For {pubDate}
                     </h2>
-                    <p className="font-serif text-base text-black italic line-clamp-3">
-                        {clean(editorial.teaser)}
+                    {/* STATIC TEASER */}
+                    <p className="font-serif text-base text-black italic">
+                        A wealth of news awaits you today.
                     </p>
                 </div>
             </article>
