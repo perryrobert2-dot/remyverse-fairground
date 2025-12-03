@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "https://storage.googleapis.com/remys-digest-public-assets/content/current_edition.html"
+    }
+  ]
+}
