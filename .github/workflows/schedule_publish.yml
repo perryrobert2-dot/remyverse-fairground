@@ -1,0 +1,35 @@
+# .github/workflows/schedule_publish.yml
+
+name: Daily Live Site Pointer Update
+
+on:
+  # This sets the script to run every day at 00:01 AM UTC.
+  # UTC is 10 hours behind AEDT, so 00:01 AM UTC is 10:01 AM AEDT.
+  # Adjust '00' to '14' for 12:01 AM AEDT (10 hours behind UTC + 14 hours = 24 total offset)
+  schedule:
+    - cron: '1 14 * * *' # Runs at 14:01 UTC, which is 12:01 AM AEDT (during Daylight Savings)
+
+jobs:
+  update_live_site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Use a stable Python version
+
+      - name: Install Google Cloud Library
+        run: pip install google-cloud-storage
+
+      - name: Set Google Credentials
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > gcp_key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=gcp_key.json" >> $GITHUB_ENV
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Run Daily Pointer Update
+        run: python daily_pointer.py
