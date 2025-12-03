@@ -1,0 +1,28 @@
+{
+  "status": "ready",
+  "timestamp": "2025-12-03 21:58:17",
+  "receipt": {
+    "status": "failed",
+    "bill_title": null,
+    "vote_result": null,
+    "duopoly_check": null
+  },
+  "red_balloon": {
+    "prime_local": {
+      "source": "Manly Observer",
+      "headlines": [
+        "$11 million Dee Why development approved and more in this week\u2019s DA Round Up",
+        "Music to our ears as Manly Warringah Choir celebrates 50 not out",
+        "Locals lose thousands to scammers in this week\u2019s Crime Watch"
+      ]
+    },
+    "elsewhere_troppo": {
+      "source": "NT News (or Fallback)",
+      "headlines": [
+        "Croc snatches pet dog from popular resort beach - The Cairns Post",
+        "\u2018The long road back\u2019: Heart attack victim shares remote NT survival story - NT News"
+      ],
+      "flavor": "chaotic"
+    }
+  }
+}

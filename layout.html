@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Remy Digest - Daily Dispatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              gothic: ['"UnifrakturMaguntia"', 'cursive'],
+              serif: ['"Playfair Display"', 'serif'],
+              sans: ['"Roboto Condensed"', 'sans-serif'],
+            },
+            colors: {
+              'paper': '#f4f1ea',
+              'ink': '#1a1918',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { background-color: #2d3748; }
+      /* Custom Nav Hover Effect */
+      .nav-link:hover { text-decoration: underline; color: #c53030; }
+      
+      /* Curlicue Divider Class */
+      .ornament-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #1a1918;
+        opacity: 0.6;
+        margin: 1rem 0;
+      }
+      .ornament-divider::before,
+      .ornament-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #1a1918;
+      }
+      .ornament-divider:not(:empty)::before { margin-right: .5em; }
+      .ornament-divider:not(:empty)::after { margin-left: .5em; }
+    </style>
+</head>
+<body class="bg-neutral-900 py-8 px-4 font-sans">
+    <div class="max-w-4xl mx-auto bg-paper text-ink shadow-2xl overflow-hidden rounded-sm relative border border-stone-400">
+        
+        <header class="p-6 text-center relative" style="background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');">
+          
+          <div class="flex justify-between items-end pb-2 mb-4 text-xs font-bold uppercase tracking-widest opacity-60 border-b-2 border-black font-sans">
+             <div>Vol. 732</div>
+             <div>Northern Beaches</div>
+             <div class="text-red-800">Cost: 10 Minutes</div>
+          </div>
+
+          <img src="https://storage.googleapis.com/remys-digest-public-assets/static/Professor%20Dachshund%20Desk%20Scene.jpg" 
+               alt="The Remy Digest Masthead" 
+               class="mx-auto h-24 w-24 object-cover rounded-full border-2 border-black mb-4 shadow-sm sepia-[.3]">
+
+          <h1 class="text-5xl md:text-7xl font-serif font-black text-ink mb-2 leading-none tracking-tight uppercase">
+            The Remy Digest
+          </h1>
+          
+          <div class="ornament-divider font-serif text-xl">❦</div>
+
+          <p class="font-serif italic text-lg md:text-xl text-stone-600">
+            "Factual Receipts. Fictional Coping Mechanisms."
+          </p>
+
+          <nav class="mt-6 border-t border-b border-black py-2 flex flex-wrap justify-center gap-6 font-bold uppercase tracking-widest text-sm font-sans">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="#" class="nav-link">The Receipt</a>
+            <a href="#" class="nav-link">Local</a>
+            <a href="#" class="nav-link">Arts</a>
+            <a href="#" class="nav-link">Troppo</a>
+          </nav>
+        </header>
+
+        <main class="p-4 md:p-8 flex flex-col md:flex-row gap-8">
+            
+            <aside class="w-full md:w-1/4 flex flex-col gap-4 text-center md:text-left">
+                <div class="border-2 border-black p-2 bg-white rotate-1 shadow-md">
+                    <img src="https://storage.googleapis.com/remys-digest-public-assets/static/Full%20Clown%20Dachshund%20with%20Bear.png" 
+                         alt="Puddles" 
+                         class="w-full h-auto grayscale contrast-125">
+                </div>
+                <div class="font-serif border-t border-black pt-2">
+                    <h3 class="font-bold text-lg uppercase tracking-widest">Puddles</h3>
+                    <p class="italic text-sm text-stone-600">Chief Tragedian</p>
+                    <div class="ornament-divider text-sm">❧</div>
+                    <p class="text-xs mt-2 leading-tight font-serif">"I read the receipts so you don't have to."</p>
+                </div>
+            </aside>
+
+            <article class="flex-1 prose prose-stone prose-lg prose-headings:font-serif prose-headings:uppercase prose-headings:font-bold prose-p:font-serif prose-a:text-blue-800 first-letter:float-left first-letter:text-5xl first-letter:pr-2 first-letter:font-gothic first-letter:text-ink">
+                
+                {{CONTENT_GOES_HERE}}
+
+            </article>
+
+        </main>
+
+        <footer class="bg-ink text-paper p-6 text-center font-serif text-sm border-t-4 border-double border-stone-500">
+          <div class="ornament-divider text-stone-500 text-lg">⚜</div>
+          <p>&copy; 2025 The Remy Digest. Modular Press V10.2.</p>
+          <p class="opacity-50 text-xs mt-2">Warning: Contains satire, sarcasm, and traces of ibis feathers.</p>
+        </footer>
+    </div>
+</body>
+</html>
