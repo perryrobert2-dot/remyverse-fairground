@@ -1,14 +1,15 @@
 import os
 from PIL import Image
 
-# Configuration
-IMAGE_DIR = os.path.join("images")
+# Configuration: Targets the root-level 'images' folder
+IMAGE_DIR = "images"
 
 def process_images():
     print(f"[*] The Darkroom: Scanning {IMAGE_DIR} for PNGs...")
     
     if not os.path.exists(IMAGE_DIR):
-        print(f"[!] Error: Image directory not found at {IMAGE_DIR}")
+        print(f"[!] Warning: Image directory '{IMAGE_DIR}' not found. Creating it.")
+        os.makedirs(IMAGE_DIR)
         return
 
     # Scan for PNG files
@@ -27,7 +28,6 @@ def process_images():
             # Open the image
             with Image.open(png_path) as img:
                 # Convert RGBA (Transparency) to RGB (White background)
-                # This prevents errors if your PNG has a transparent background
                 if img.mode in ('RGBA', 'LA'):
                     background = Image.new(img.mode[:-1], img.size, (255, 255, 255))
                     background.paste(img, img.split()[-1])
@@ -39,8 +39,7 @@ def process_images():
                 
             print(f"[+] Developed: {filename} -> {jpg_filename}")
             
-            # Optional: Delete the original PNG to keep folder clean?
-            # os.remove(png_path) 
+            # Optional: os.remove(png_path) is commented out for safety
             
         except Exception as e:
             print(f"[!] Failed to convert {filename}: {e}")

@@ -15,11 +15,10 @@ try:
         keys = json.load(f)
         API_KEY = keys.get("openaustralia")
 except Exception:
-    print("[!] Warning: Could not load API Key from keys.json")
+    print("[!] Warning: Could not load OpenAustralia Key from keys.json")
 
 # Data Sources
 MANLY_RSS = "https://manlyobserver.com.au/feed/"
-# Google Proxy for NT News (Chaos Filter: Crocs, Snakes, UFOs)
 TROPPO_RSS = "https://news.google.com/rss/search?q=site:ntnews.com.au+OR+site:cairnspost.com.au+(croc+OR+crocodile+OR+snake+OR+brawl+OR+beer+OR+naked+OR+weird+OR+attack+OR+ufo+OR+alien)&hl=en-AU&gl=AU&ceid=AU:en"
 
 OUTPUT_FILE = "wire_copy.json"
@@ -29,7 +28,7 @@ def fetch_receipt():
     print(f"[*] Fetching political receipts...")
     
     if not API_KEY:
-        print("[-] No API Key found. Skipping Receipt.")
+        print("[-] No OpenAustralia Key found. Skipping Receipt.")
         return None
 
     # Endpoint: OpenAustralia getDivisions
@@ -39,7 +38,6 @@ def fetch_receipt():
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
             data = response.json()
-            # Just grab the most recent one for now
             if data:
                 return {
                     "status": "success",
@@ -48,7 +46,7 @@ def fetch_receipt():
                     "house": data[0].get('house', 'representatives')
                 }
         else:
-            print(f"[!] API Auth Failed: {response.status_code}")
+            print(f"[!] OpenAustralia API Auth Failed: {response.status_code}")
     except Exception as e:
         print(f"[!] Connection Error: {e}")
     
