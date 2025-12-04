@@ -1,90 +1,117 @@
 import os
-import sys
-from newsroom import staff
+import json
+import datetime
+import newsroom.staff as staff
 
-# --- Configuration ---
-OUTPUT_DIR = "content"
-TEMPLATE_FILE = "layout.html"
-FINAL_FILE = "index.html"
+# --- CONFIGURATION ---
+LAYOUT_FILE = "layout.html"
+OUTPUT_FILE = "index.html"
+
+# Data Files
+WIRE_FILE = "wire_copy.json"
+FIGHT_FILE = "fight_card.json"
+SAGA_FILE = "saga.json"
+RULES_FILE = "council_rules.json"
+
+def load_data(filename):
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    return {}
 
 def main():
-    print("[*] POWERING UP NEWSROOM V10.2...")
-    
-    # 1. Instantiate the Writers
-    writers = {
-        "lead": staff.PuddlesLead(),
-        "roast": staff.RoastMaster(),
-        "spray": staff.SprayPolice(),
-        "arts": staff.ArtsCornelius(),
-        "zoomies": staff.ZoomiesMenace(),
-        "pitd": staff.ComicPITD(),
-        "soliloquy": staff.SoliloquySoul(),
-        "letters": staff.LettersSpit(),
-        "mystic": staff.MysticFifi()
-    }
-    
-    # 2. Commission Content (The Build Loop)
-    content_map = {}
-    for name, writer in writers.items():
-        print(f"    -> Commissioning {name.upper()}...")
-        try:
-            content_map[name] = writer.write()
-        except Exception as e:
-            print(f"    [!] Error from {name}: {e}")
-            content_map[name] = f"<p>Error in {name} module.</p>"
+    print("[*] POWERING UP NEWSROOM V10.3...")
 
-    # 3. Stitch the Edition (The Layout Order)
-    # Order: Lead -> Roast -> Spray -> Arts -> Zoomies -> PITD -> Soliloquy -> Back Page (Letters/Mystic)
-    
-    full_body = f"""
-    <div class="edition-wrapper">
-        <section id="lead-story">
-            {content_map['lead']}
-        </section>
-        
-        <hr class="divider">
-        
-        <div class="row">
-            <div class="col-left">
-                {content_map['roast']}
-                {content_map['spray']}
-                {content_map['arts']}
-            </div>
-            <div class="col-right">
-                {content_map['pitd']}
-                {content_map['zoomies']}
-                {content_map['soliloquy']}
-            </div>
-        </div>
-        
-        <hr class="divider">
-        
-        <section id="back-page">
-            {content_map['letters']}
-            {content_map['mystic']}
-        </section>
-    </div>
-    """
+    # 1. Load the Brains (Data)
+    wire_data = load_data(WIRE_FILE)
+    fight_data = load_data(FIGHT_FILE)
+    saga_data = load_data(SAGA_FILE)
+    rules_data = load_data(RULES_FILE)
 
-    # 4. Merge into Layout
-    if not os.path.exists(TEMPLATE_FILE):
-        print(f"[!] Template {TEMPLATE_FILE} not found. Creating basic wrapper.")
-        final_html = f"<html><body>{full_body}</body></html>"
+    # 2. Instantiate the Staff (Using Correct Class Names)
+    print("    -> Waking up Puddles...")
+    puddles = staff.Puddles("Puddles", "Chief Tragedian")
+    
+    print("    -> Waking up Cornelius...")
+    cornelius = staff.Cornelius("Cornelius", "Arts Critic")
+    
+    print("    -> Waking up Arthur Pumble...")
+    arthur = staff.ArthurPumble("Arthur Pumble", "Concerned Citizen")
+    
+    print("    -> Waking up The Zoomies Kid...")
+    zoomies = staff.ZoomiesKid("Zoomies Kid", "Local Menace")
+    
+    print("    -> Waking up Madame Fifi...")
+    fifi = staff.MadameFifi("Madame Fifi", "Medium")
+
+    # 3. Commission the Columns
+    print("    -> Commissioning LEAD STORY...")
+    lead_html = puddles.write_lead(fight_data)
+
+    print("    -> Commissioning ROAST...")
+    roast_html = staff.embed_image_section("roast_current.jpg", "Remy Roasts History")
+
+    print("    -> Commissioning ARTS...")
+    arts_html = cornelius.write_arts(saga_data)
+
+    print("    -> Commissioning ZOOMIES...")
+    zoomies_html = zoomies.write_rant(saga_data)
+
+    print("    -> Commissioning PITD (Comic)...")
+    pitd_html = staff.embed_image_section(
+        "pitd_current.jpg", 
+        "Philosophers Ironic Throw Down", 
+        "Fig 1: The inevitable stalemate."
+    )
+
+    print("    -> Commissioning SOLILOQUY...")
+    soliloquy_html = puddles.write_soliloquy("soliloquy_current.jpg")
+
+    print("    -> Commissioning LETTERS...")
+    letters_html = arthur.write_letters_column(saga_data, rules_data)
+
+    print("    -> Commissioning THE SEANCE...")
+    mystic_html = fifi.write_seance()
+
+    # 4. Stitch the Body HTML
+    # Order: Lead -> Roast -> Arts -> Zoomies -> PITD -> Soliloquy -> Letters -> Mystic
+    full_body_html = (
+        lead_html +
+        roast_html +
+        "<hr class='my-8 border-black'>" +
+        arts_html +
+        zoomies_html +
+        "<hr class='my-8 border-black'>" +
+        pitd_html +
+        soliloquy_html +
+        "<div class='bg-stone-100 p-6 mt-8 border-t-4 border-black'>" + # Back Page Wrapper
+        letters_html +
+        mystic_html +
+        "</div>"
+    )
+
+    # 5. Merge into Layout (The Printing Press)
+    print(f"    -> Printing to {OUTPUT_FILE}...")
+    
+    if not os.path.exists(LAYOUT_FILE):
+        print(f"[!] CRITICAL: {LAYOUT_FILE} missing! Cannot print.")
+        return
+
+    with open(LAYOUT_FILE, "r", encoding="utf-8") as f:
+        template = f.read()
+
+    # Inject Content
+    if "{{CONTENT_GOES_HERE}}" in template:
+        final_html = template.replace("{{CONTENT_GOES_HERE}}", full_body_html)
     else:
-        with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
-            template = f.read()
-        
-        if "{{CONTENT_GOES_HERE}}" in template:
-            final_html = template.replace("{{CONTENT_GOES_HERE}}", full_body)
-        else:
-            print("[!] Placeholder not found, appending content.")
-            final_html = template + full_body
+        # Fallback if tag is missing
+        final_html = template + full_body_html
 
-    # 5. Publish
-    with open(FINAL_FILE, 'w', encoding='utf-8') as f:
+    # 6. Save Live Site
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(final_html)
-    
-    print(f"[+] EDITION PUBLISHED to {FINAL_FILE}")
+
+    print(f"[+] SUCCESS: Edition published to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
