@@ -20,7 +20,7 @@ except Exception as e:
 # Configure Gemini
 if GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
-    MODEL = genai.GenerativeModel('gemini-1.5-flash')
+    MODEL = genai.GenerativeModel('gemini-2.5-flash')
 else:
     MODEL = None
     print("[!] Writers are on strike (No Gemini Key found).")
@@ -87,7 +87,7 @@ class Puddles(Writer):
         content = self.generate_text(prompt)
         return f"""
         <div class="soliloquy-container">
-            <img src="content/images/{image_filename}" class="w-full border-4 border-double border-black mb-4">
+            <img src="images/{image_filename}" class="w-full border-4 border-double border-black mb-4">
             <div class="font-serif italic text-lg text-center">"{content}"</div>
         </div>
         """
@@ -168,13 +168,13 @@ class MadameFifi(Writer):
 
 # --- ASSET EMBEDDERS (No AI needed) ---
 def embed_image_section(filename, title, caption_text=""):
-    path = os.path.join("content", "images", filename)
+    path = os.path.join("images", filename)
     # Check relative to where the script is RUN (root)
     if os.path.exists(path):
         return f"""
         <div class="image-embed my-8 border-t-2 border-b-2 border-black py-4">
             <h3 class="font-sans font-black uppercase text-2xl text-center mb-2">{title}</h3>
-            <img src="content/images/{filename}" class="w-full h-auto mx-auto shadow-lg">
+            <img src="images/{filename}" class="w-full h-auto mx-auto shadow-lg">
             <p class="text-center italic mt-2 text-sm">{caption_text}</p>
         </div>
         """

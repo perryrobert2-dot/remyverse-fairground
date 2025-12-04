@@ -2,7 +2,7 @@ import os
 from PIL import Image
 
 # Configuration
-IMAGE_DIR = os.path.join("content", "images")
+IMAGE_DIR = os.path.join("images")
 
 def process_images():
     print(f"[*] The Darkroom: Scanning {IMAGE_DIR} for PNGs...")
