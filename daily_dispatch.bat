@@ -24,7 +24,7 @@ echo  [ACTION REQUIRED]:
 echo   1. Check 'wire_copy.json' (The News)
 echo   2. Check 'fight_card.json' (The PITD Matchup)
 echo   3. Check 'saga.json' (The Arthur Pumble Story)
-echo   4. Ensure your images (pitd_current.jpg, etc) are in content/images/
+echo   4. CRITICAL: Ensure 'pitd_current.jpg' exists in content/images/
 echo.
 echo  Edit any files you wish, save them, and then...
 echo.
@@ -37,13 +37,6 @@ echo  PHASE 3: THE NEWSROOM (ASSEMBLE)
 echo  The Staff are writing their columns...
 echo ========================================================
 python assemble.py
-
-echo.
-echo ========================================================
-echo  PHASE 4: THE PUBLISHER
-echo  Merging content into the Broadsheet Layout...
-echo ========================================================
-python publish.py
 
 echo.
 echo ========================================================
