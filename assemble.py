@@ -5,10 +5,13 @@ import newsroom.staff as staff # Import the consolidated staff module
 
 # --- CONFIGURATION ---
 LAYOUT_FILE = "layout.html"
-INDEX_FILE = "index.html"
+INDEX_FILE = "index.html" # Defines the name of the front page file
+OUTPUT_FILE = INDEX_FILE  # Target for the final live site
+
+# Subpage Definitions
 BACKPAGE_FILE = "backpage.html"
 ARTS_FILE = "arts.html"
-SPORTS_FILE = "sports.html" # Placeholder for future expansion
+SPORTS_FILE = "sports.html" # Placeholder for future links
 
 # Data Files (Relative to Root)
 WIRE_FILE = "wire_copy.json"
@@ -55,13 +58,22 @@ def main():
     saga_data = load_data(SAGA_FILE)
     rules_data = load_data(RULES_FILE)
 
-    # 2. Instantiate Staff (Assuming staff.py contains classes Puddles, ArthurPumble, etc.)
+    # 2. Instantiate Staff (Using Correct Class Names)
+    print("    -> Waking up Puddles...")
     puddles = staff.Puddles("Puddles", "Chief Tragedian")
-    cornelius = staff.Cornelius("Cornelius", "Arts Critic")
-    arthur = staff.ArthurPumble("Arthur Pumble", "Concerned Citizen")
-    zoomies = staff.ZoomiesKid("Zoomies Kid", "Local Menace")
-    fifi = staff.MadameFifi("Madame Fifi", "Medium")
     
+    print("    -> Waking up Cornelius...")
+    cornelius = staff.Cornelius("Cornelius", "Arts Critic")
+    
+    print("    -> Waking up Arthur Pumble...")
+    arthur = staff.ArthurPumble("Arthur Pumble", "Concerned Citizen")
+    
+    print("    -> Waking up The Zoomies Kid...")
+    zoomies = staff.ZoomiesKid("Zoomies Kid", "Local Menace")
+    
+    print("    -> Waking up Madame Fifi...")
+    fifi = staff.MadameFifi("Madame Fifi", "Medium")
+
     # --- 3. PASS 1: BUILD SUBPAGES (FULL CONTENT) ---
     print("\n[+] PASS 1: Building Full Columns...")
     
@@ -88,21 +100,21 @@ def main():
     # Generate the Lead Story (Always Full Content on Front Page)
     lead_html = puddles.write_full_lead(fight_data)
     
-    # Generate Teasers
+    # Generate Teasers (These rely on the existence of the subpages created above)
     teaser_arts = cornelius.write_teaser(link_to=ARTS_FILE)
     teaser_letters = arthur.write_teaser(link_to=BACKPAGE_FILE)
     
     # Embed Images
     roast_embed = staff.embed_image_section("roast_current.jpg", "Remy Roasts History")
     soliloquy_embed = puddles.write_soliloquy("soliloquy_current.jpg")
-    pitd_embed = staff.embed_image_section("pitd_current.jpg", "PITD: The Throw Down")
-    
+    pitd_embed = staff.embed_image_section("pitd_current.jpg", "Philosophers Ironic Throw Down")
+
     # Stitch the Front Page Body
     front_page_body = (
         lead_html +
         roast_embed +
         "<div class='border-2 border-dashed border-red-700 p-4 my-8'>" +
-        "<h2>In Today's Digest:</h2>" +
+        "<h2 class='text-red-700 uppercase'>Also in Today's Digest:</h2>" +
         teaser_arts +
         teaser_letters +
         "</div>" +
@@ -120,8 +132,14 @@ def main():
     with open(LAYOUT_FILE, "r", encoding="utf-8") as f:
         template = f.read()
     
-    final_html = template.replace("{{CONTENT_GOES_HERE}}", front_page_body)
+    # Inject Content
+    if "{{CONTENT_GOES_HERE}}" in template:
+        final_html = template.replace("{{CONTENT_GOES_HERE}}", front_page_body)
+    else:
+        # Fallback if tag is missing
+        final_html = template + front_page_body
 
+    # 6. Save Live Site
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(final_html)
 
