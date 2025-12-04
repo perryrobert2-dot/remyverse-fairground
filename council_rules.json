@@ -1,0 +1,10 @@
+{
+  "bin_night": "Tuesday",
+  "bins": {
+    "yellow": "Containers & Glass",
+    "blue": "Paper & Cardboard",
+    "red": "General Waste (Landfill)",
+    "green": "Garden Organics"
+  },
+  "bulky_limit": "2 collections per household per year (Booking Required)"
+}

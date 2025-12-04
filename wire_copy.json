@@ -1,6 +1,6 @@
 {
   "status": "ready",
-  "timestamp": "2025-12-03 21:58:17",
+  "timestamp": "2025-12-04 11:22:30",
   "receipt": {
     "status": "failed",
     "bill_title": null,
@@ -11,16 +11,16 @@
     "prime_local": {
       "source": "Manly Observer",
       "headlines": [
+        "Council bids for major affordable housing changes; denounces loss of planning control",
         "$11 million Dee Why development approved and more in this week\u2019s DA Round Up",
-        "Music to our ears as Manly Warringah Choir celebrates 50 not out",
-        "Locals lose thousands to scammers in this week\u2019s Crime Watch"
+        "Music to our ears as Manly Warringah Choir celebrates 50 not out"
       ]
     },
     "elsewhere_troppo": {
       "source": "NT News (or Fallback)",
       "headlines": [
         "Croc snatches pet dog from popular resort beach - The Cairns Post",
-        "\u2018The long road back\u2019: Heart attack victim shares remote NT survival story - NT News"
+        "ABC faces fiery grilling in Canberra over journalist\u2019s attack on Senator Price - The Cairns Post"
       ],
       "flavor": "chaotic"
     }
