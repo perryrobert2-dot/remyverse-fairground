@@ -1,15 +1,31 @@
 {
   "version": 2,
+  "routes": [
+    {
+      "src": "/(index|backpage|arts).html",
+      "dest": "/$1.html",
+      "status": 200
+    },
+    {
+      "src": "/(backpage|arts)",
+      "dest": "/$1.html"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/images/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "builds": [
     {
       "src": "index.html",
       "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ]
 }
