@@ -98,23 +98,26 @@ class Writer:
 class Puddles(Writer):
     # Full Lead Story (always on index.html)
     def write_full_lead(self, fight_data, rival_foil="The Cronulla Beige"):
-        # [Implementation details omitted for brevity, assumes full prompt logic from previous turn]
+        status = fight_data.get("status", "BUILD_UP")
+        topic = fight_data.get("topic", "Everything")
+        blue = fight_data.get("blue_team", "Unknown")
+        red = fight_data.get("red_team", "Unknown")
+
         prompt = f"""
         Write the LEAD STORY (Headline + 250 words) for the front page.
-        The topic is the philosophical fight between {fight_data.get('blue_team', 'Unknown')} and {fight_data.get('red_team', 'Unknown')}.
+        The current status of the weekly philosophical fight is: {status}.
+        The topic is: {topic}. The Blue Team is: {blue}. The Red Team is: {red}.
+        
+        If status is BUILD_UP: Hype the upcoming match. Quote the fighters trash-talking.
         MANDATORY: Make a snide reference to our boring rival newspaper, '{rival_foil}', implied to be run by a secret dachshund named Trevor.
+        
+        CRITICAL FORMATTING NOTE: Do not use excessive bolding, markdown stars (***), or all-caps in the article body or headline. Use only standard H2 or H3 headers, and normal paragraph and sentence structure.
         """
         content = self.generate_text(prompt)
-        return f"""<div class="lead-story"><h2>{content}</h2></div>"""
-
-    def write_soliloquy(self, image_filename):
-        topic_hint = image_filename.replace("soliloquy_", "").replace(".jpg", "")
-        prompt = f"Write a short, melancholic Shakespearean soliloquy (100 words) from the sad clown Puddles reflecting on the alternate political history of: {topic_hint}."
-        content = self.generate_text(prompt)
+        # Wrap in HTML
         return f"""
-        <div class="soliloquy-container my-8 text-center">
-            <img src="images/{image_filename}" class="mx-auto h-64 border-4 border-double border-black mb-4">
-            <div class="font-serif italic text-lg text-stone-700 max-w-lg mx-auto">"{content}"</div>
+        <div class="lead-story">
+            {content}
         </div>
         """
     # Placeholder for write_teaser (as full lead is on index)
