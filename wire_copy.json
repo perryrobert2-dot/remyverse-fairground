@@ -1,11 +1,9 @@
 {
   "status": "ready",
-  "timestamp": "2025-12-04 11:39:17",
+  "timestamp": "2025-12-04 11:54:16.167808",
   "receipt": {
     "status": "failed",
-    "bill_title": null,
-    "vote_result": null,
-    "duopoly_check": null
+    "bill_title": null
   },
   "red_balloon": {
     "prime_local": {
@@ -17,10 +15,11 @@
       ]
     },
     "elsewhere_troppo": {
-      "source": "NT News (or Fallback)",
+      "source": "NT News / Google Proxy",
       "headlines": [
         "Croc snatches pet dog from popular resort beach - The Cairns Post",
-        "ABC faces fiery grilling in Canberra over journalist\u2019s attack on Senator Price - The Cairns Post"
+        "ABC faces fiery grilling in Canberra over journalist\u2019s attack on Senator Price - The Cairns Post",
+        "ABC faces fiery grilling in Canberra over journalist\u2019s attack on Senator Price - NT News"
       ],
       "flavor": "chaotic"
     }

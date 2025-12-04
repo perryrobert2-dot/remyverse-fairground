@@ -1,198 +1,107 @@
-import requests
-import json
-import datetime
-import sys
-import time
-import os
 import feedparser
+import json
+import requests
+import datetime
+import os
+import random
 
-# --- Configuration ---
-# API Key for TheyVoteForYou.org.au
-API_KEY = os.getenv("TVFY_API_KEY", "Gv2bM9C84dQPFvNnkVBVcidf").strip()
+# --- CONFIGURATION ---
+# Load OpenAustralia Key from newsroom/keys.json
+KEY_FILE = os.path.join("newsroom", "keys.json")
+API_KEY = None
 
-# API Endpoints
-TVFY_URLS = [
-    "https://theyvoteforyou.org.au/api/v1",
-    "https://www.theyvoteforyou.org.au/api/v1"
-]
+try:
+    with open(KEY_FILE, "r") as f:
+        keys = json.load(f)
+        API_KEY = keys.get("openaustralia")
+except Exception:
+    print("[!] Warning: Could not load API Key from keys.json")
 
-# RSS Feed URLs
-RSS_MANLY = "https://manlyobserver.com.au/feed/"
+# Data Sources
+MANLY_RSS = "https://manlyobserver.com.au/feed/"
+# Google Proxy for NT News (Chaos Filter: Crocs, Snakes, UFOs)
+TROPPO_RSS = "https://news.google.com/rss/search?q=site:ntnews.com.au+OR+site:cairnspost.com.au+(croc+OR+crocodile+OR+snake+OR+brawl+OR+beer+OR+naked+OR+weird+OR+attack+OR+ufo+OR+alien)&hl=en-AU&gl=AU&ceid=AU:en"
 
-# Updated to use Google News Proxy with Chaos Filter (Crocs, UFOs, Aliens, etc.)
-RSS_NT_NEWS = "https://news.google.com/rss/search?q=site:ntnews.com.au+OR+site:cairnspost.com.au+(croc+OR+crocodile+OR+snake+OR+brawl+OR+beer+OR+naked+OR+weird+OR+attack+OR+ufo+OR+alien)&hl=en-AU&gl=AU&ceid=AU:en"
-
-# Fallback for Troppo if NT News is restricted/empty (often happens with NewsCorp feeds)
-RSS_TROPPO_FALLBACK = "https://www.betootaadvocate.com/feed/" 
-
-def fetch_rss_headlines(feed_url, limit=3, fallback_url=None):
-    """
-    Fetches headlines using feedparser. 
-    Returns a list of titles.
-    """
-    print(f"[*] Fetching RSS: {feed_url}...")
-    try:
-        feed = feedparser.parse(feed_url)
-        
-        # Check if feed is empty or failed (bozo bit or empty entries)
-        if not feed.entries and fallback_url:
-            print(f"[!] Primary feed empty. Switching to fallback: {fallback_url}")
-            feed = feedparser.parse(fallback_url)
-
-        headlines = []
-        for i, entry in enumerate(feed.entries):
-            if i >= limit:
-                break
-            headlines.append(entry.title)
-            
-        if not headlines:
-            return ["No headlines found."]
-            
-        return headlines
-
-    except Exception as e:
-        print(f"[!] RSS Error ({feed_url}): {e}")
-        return ["Error fetching feed"]
-
-def determine_party_position(votes, party_name):
-    """
-    Determines if a party voted Yes or No based on majority rule.
-    """
-    party_votes = [v['vote'] for v in votes if party_name.lower() in v['party'].lower()]
-    
-    if not party_votes:
-        return None
-    
-    yes_count = party_votes.count('Aye')
-    no_count = party_votes.count('No')
-    
-    if yes_count > no_count:
-        return "Yes"
-    elif no_count > yes_count:
-        return "No"
-    else:
-        return "Split"
-
-def get_working_base_url():
-    """
-    Checks connection to API. Returns valid URL or None.
-    """
-    if API_KEY == "YOUR_KEY_HERE" or API_KEY == "":
-        return None
-
-    for url in TVFY_URLS:
-        test_endpoint = f"{url}/divisions.json?key={API_KEY}"
-        try:
-            response = requests.get(test_endpoint, timeout=5)
-            if response.status_code in [401, 403]:
-                print(f"[!] API Auth Failed: {response.status_code}")
-                return None
-            response.raise_for_status()
-            return url
-        except requests.exceptions.RequestException:
-            continue
-    return None
+OUTPUT_FILE = "wire_copy.json"
 
 def fetch_receipt():
-    """
-    Fetches voting data.
-    Returns a dict with 'status': 'success'/'failed' and details.
-    """
-    # Initialize failure state
-    failure_receipt = {
-        "status": "failed",
-        "bill_title": None,
-        "vote_result": None,
-        "duopoly_check": None
-    }
-
-    base_url = get_working_base_url()
+    """Fetches the latest political vote/division."""
+    print(f"[*] Fetching political receipts...")
     
-    if not base_url:
-        print("[-] API unreachable or unauthorized. Generating Null Receipt.")
-        return failure_receipt
-        
-    print(f"[*] Scanning recent divisions for receipt...")
+    if not API_KEY:
+        print("[-] No API Key found. Skipping Receipt.")
+        return None
+
+    # Endpoint: OpenAustralia getDivisions
+    url = f"https://www.openaustralia.org.au/api/getDivisions?key={API_KEY}&output=json"
     
     try:
-        # Get recent divisions
-        url = f"{base_url}/divisions.json?key={API_KEY}"
         response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        divisions_list = response.json()
-        
-        # Iterate (Check last 5)
-        for i, div_summary in enumerate(divisions_list[:5]):
-            div_id = div_summary['id']
-            
-            # Fetch details
-            detail_url = f"{base_url}/divisions/{div_id}.json?key={API_KEY}"
-            detail_resp = requests.get(detail_url, timeout=10)
-            
-            if detail_resp.status_code != 200:
-                continue
-                
-            data = detail_resp.json()
-            votes = data.get('votes', [])
-            
-            labor_pos = determine_party_position(votes, "Labor")
-            liberal_pos = determine_party_position(votes, "Liberal")
-            
-            # Duopoly Check
-            if labor_pos and liberal_pos and labor_pos == liberal_pos:
-                if labor_pos in ["Yes", "No"]:
-                    print(f"[+] FOUND RECEIPT: Division {div_id}")
-                    return {
-                        "status": "success",
-                        "bill_title": data.get('name', 'Unknown Bill'),
-                        "vote_result": "Passed" if data.get('passed') else "Failed",
-                        "duopoly_check": f"Both Voted {labor_pos}"
-                    }
-            time.sleep(0.5)
-
-        print("[-] No bipartisan receipt found in recent scan.")
-        return failure_receipt
-
+        if response.status_code == 200:
+            data = response.json()
+            # Just grab the most recent one for now
+            if data:
+                return {
+                    "status": "success",
+                    "bill_title": data[0].get('name', 'Unknown Bill'),
+                    "date": data[0].get('date', 'Unknown Date'),
+                    "house": data[0].get('house', 'representatives')
+                }
+        else:
+            print(f"[!] API Auth Failed: {response.status_code}")
     except Exception as e:
-        print(f"[!] API Error during scan: {e}")
-        return failure_receipt
+        print(f"[!] Connection Error: {e}")
+    
+    return None
 
-def generate_wire_copy():
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    # 1. Fetch Receipts
+def fetch_rss(url, limit=3):
+    """Fetches headlines from an RSS feed."""
+    print(f"[*] Fetching RSS: {url}...")
+    try:
+        feed = feedparser.parse(url)
+        headlines = []
+        for entry in feed.entries[:limit]:
+            headlines.append(entry.title)
+        return headlines
+    except Exception as e:
+        print(f"[!] RSS Error: {e}")
+        return []
+
+def run_scout():
+    # 1. Get Receipt
     receipt_data = fetch_receipt()
-    
-    # 2. Fetch Red Balloons (Distractions)
-    manly_headlines = fetch_rss_headlines(RSS_MANLY, limit=3)
-    troppo_headlines = fetch_rss_headlines(RSS_NT_NEWS, limit=2, fallback_url=RSS_TROPPO_FALLBACK)
-    
-    # 3. Construct JSON
+    if not receipt_data:
+        receipt_data = {"status": "failed", "bill_title": None}
+
+    # 2. Get Local News (Manly)
+    local_news = fetch_rss(MANLY_RSS)
+
+    # 3. Get Troppo News (NT/Weird)
+    troppo_news = fetch_rss(TROPPO_RSS)
+
+    # 4. Construct Wire Copy
     wire_data = {
         "status": "ready",
-        "timestamp": timestamp,
+        "timestamp": str(datetime.datetime.now()),
         "receipt": receipt_data,
         "red_balloon": {
             "prime_local": {
                 "source": "Manly Observer",
-                "headlines": manly_headlines
+                "headlines": local_news
             },
             "elsewhere_troppo": {
-                "source": "NT News (or Fallback)",
-                "headlines": troppo_headlines,
+                "source": "NT News / Google Proxy",
+                "headlines": troppo_news,
                 "flavor": "chaotic"
             }
         }
     }
+
+    # 5. Save to File
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(wire_data, f, indent=2)
     
-    # 4. Save
-    filename = "wire_copy.json"
-    try:
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(wire_data, f, indent=2)
-        print(f"[+] Wire Copy Updated")
-    except IOError as e:
-        print(f"[CRITICAL] Failed to write file: {e}")
+    print(f"[+] Wire Copy Updated")
 
 if __name__ == "__main__":
-    generate_wire_copy()
+    run_scout()

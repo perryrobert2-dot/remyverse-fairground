@@ -1,145 +1,181 @@
 import os
 import json
-import google.generativeai as genai
 import random
+import google.generativeai as genai
 
-# --- Configuration ---
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.0-flash')
+# --- CONFIGURATION & AUTH ---
+# Load the keys from the secure local file
+KEY_FILE = os.path.join(os.path.dirname(__file__), "keys.json")
+GOOGLE_API_KEY = None
 
-def load_json(filepath):
-    try:
-        with open(filepath, 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}
+try:
+    with open(KEY_FILE, "r") as f:
+        secrets = json.load(f)
+        GOOGLE_API_KEY = secrets.get("gemini")
+except FileNotFoundError:
+    print(f"[!] CRITICAL: Key file missing at {KEY_FILE}")
+except Exception as e:
+    print(f"[!] Error loading keys: {e}")
 
-# --- THE WRITERS ---
+# Configure Gemini
+if GOOGLE_API_KEY:
+    genai.configure(api_key=GOOGLE_API_KEY)
+    MODEL = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    MODEL = None
+    print("[!] Writers are on strike (No Gemini Key found).")
 
-class PuddlesLead:
-    """The Editor. Writes the main story."""
-    def write(self):
-        card = load_json("fight_card.json")
-        prompt = f"""
-        Write a 250-word lead article for 'The Remyverse'.
-        Topic: The upcoming debate rumble between {card['blue_team']} vs {card['red_team']}.
-        Subject: {card['topic']}.
-        Tone: Reserved, intellectual, matter-of-fact, yet subtly hyping the violence of the debate.
+# --- BASE WRITER CLASS ---
+class Writer:
+    def __init__(self, name, role):
+        self.name = name
+        self.role = role
+
+    def generate_text(self, prompt, context=""):
+        if not MODEL:
+            return f"[{self.name} is on strike due to missing API Key]"
         
-        CRITICAL REQUIREMENT:
-        You must reference our rival newspaper, 'The Cronulla Beige', which is boring and irrelevant. 
-        Contrast our exciting intellectual rumble with their headline about "Fence Painted Grey".
-        
-        Format: HTML <article> with <h2> and <p> tags.
+        full_prompt = f"""
+        You are {self.name}, the {self.role} for 'The Remy Digest', a satirical broadsheet.
+        TONE: Old-school newspaper, cynical, witty, slightly unhinged.
+        CONTEXT: {context}
+        TASK: {prompt}
         """
-        return generate_text(prompt)
+        try:
+            response = MODEL.generate_content(full_prompt)
+            return response.text
+        except Exception as e:
+            return f"[Error generating content: {e}]"
 
-class ComicPITD:
-    """The Visual Gag."""
-    def write(self):
-        return """
-        <article class="pitd">
-            <h2>Picture in the Dirt</h2>
-            <img src="../content/images/pitd_current.jpg" alt="Fig 1: The Inevitable Stalemate" style="width:100%; border:2px solid #000;">
-            <p class="caption">Fig 1: The inevitable philosophical stalemate.</p>
-        </article>
-        """
+# --- SPECIALIZED WRITERS ---
 
-class RoastMaster:
-    """The Burn."""
-    def write(self):
-        return """
-        <article class="roast">
-            <h2>Remy Roasts History</h2>
-            <img src="../content/images/roast_current.jpg" alt="Remy judging history" style="width:100%; border:2px solid #d32f2f;">
-            <p>He has seen your timeline, and he is not impressed.</p>
-        </article>
-        """
+class Puddles(Writer):
+    def write_lead(self, fight_data, rival_foil="The Cronulla Beige"):
+        status = fight_data.get("status", "BUILD_UP")
+        topic = fight_data.get("topic", "Everything")
+        blue = fight_data.get("blue_team", "Unknown")
+        red = fight_data.get("red_team", "Unknown")
 
-class SoliloquySoul:
-    """The Melancholic Poet."""
-    def write(self):
-        # Check for image (Mocking existence for logic)
-        img_name = "soliloquy_onion.jpg" # Default mock
-        subject = "A Raw Onion"
-        
         prompt = f"""
-        Write a 100-word Shakespearean soliloquy for a Dachshund named Puddles.
-        Subject: Contemplating {subject} (based on image {img_name}).
-        Tone: Melancholic, tragic, overly dramatic about a vegetable.
-        Format: HTML <i> tags for the poem.
+        Write the LEAD STORY (Headline + 250 words).
+        The current status of the weekly philosophical fight is: {status}.
+        The topic is: {topic}.
+        The Blue Team is: {blue}. The Red Team is: {red}.
+        
+        If status is BUILD_UP: Hype the upcoming match. Quote the fighters trash-talking.
+        If status is MAIN_EVENT: Describe the carnage.
+        
+        MANDATORY: Make a snide reference to our boring rival newspaper, '{rival_foil}', implied to be run by a coward named Trevor.
         """
-        return f"<article class='soliloquy'><h2>The Soliloquy</h2>{generate_text(prompt)}</article>"
+        content = self.generate_text(prompt)
+        # Wrap in HTML
+        return f"""
+        <div class="lead-story">
+            {content}
+        </div>
+        """
 
-class LettersSpit:
-    """The Community Outrage."""
-    def write(self):
-        saga = load_json("saga.json")
-        rules = load_json("council_rules.json")
+    def write_soliloquy(self, image_filename):
+        # Infer topic from filename (e.g., soliloquy_onion.jpg -> Onion)
+        topic_hint = image_filename.replace("soliloquy_", "").replace(".jpg", "")
         
         prompt = f"""
-        Write two 'Letters to the Editor'.
-        1. From Arthur Pumble ('Outraged of Cromer'). He denies the "{saga['incident']}" regarding the {saga['details']}. He cites {rules['bin_night']} confusion.
-        2. A reply from The Neighbor (Mrs. Higgins). She has the {saga['evidence']}.
-        Tone: Petty, passive-aggressive, high-stakes council drama.
-        Format: HTML <div class='letter'>...</div>.
+        Write a short, melancholic Shakespearean soliloquy (100 words).
+        You are holding an object related to: {topic_hint}.
+        Reflect on how this object changed history (or could have).
         """
-        return f"<article class='letters'><h2>Letters to the Editor</h2>{generate_text(prompt)}</article>"
+        content = self.generate_text(prompt)
+        return f"""
+        <div class="soliloquy-container">
+            <img src="content/images/{image_filename}" class="w-full border-4 border-double border-black mb-4">
+            <div class="font-serif italic text-lg text-center">"{content}"</div>
+        </div>
+        """
 
-class SprayPolice:
-    """The Police Blotter."""
-    def write(self):
-        saga = load_json("saga.json")
+class ArthurPumble(Writer):
+    def write_letters_column(self, saga_data, council_rules):
+        incident = saga_data.get("incident", "Nothing")
+        details = saga_data.get("details", "Silence")
+        
         prompt = f"""
-        Write a dry, bureaucratic NSW Police Force media release snippet.
-        Incident: {saga['incident']} at {saga['location']}.
-        Details: {saga['details']}.
-        Tone: Extremely dry, official, boring police jargon.
-        Format: HTML <div class='police-report'>...</div>
+        Write the 'LETTERS TO THE EDITOR' column.
+        
+        LETTER 1: From 'Outraged of Cromer' (Arthur).
+        He is complaining about: {incident} ({details}).
+        He must reference specific Council Bin Rules: {council_rules}.
+        He is projecting his own guilt onto his neighbor.
+        
+        LETTER 2: A reply from 'The Neighbor at #42'.
+        Polite but passive-aggressive, exposing Arthur's hypocrisy.
         """
-        return f"<article class='spray'><h2>The Daily Spray</h2>{generate_text(prompt)}</article>"
+        content = self.generate_text(prompt)
+        return f"""
+        <div class="letters-section">
+            <h3 class="font-serif font-bold uppercase text-xl border-b border-black mb-2">The Spit Gripes</h3>
+            {content}
+        </div>
+        """
 
-class ArtsCornelius:
-    """The Critic."""
-    def write(self):
+class Cornelius(Writer):
+    def write_arts(self, saga_data):
+        item_of_dispute = saga_data.get("details", "rubbish")
+        
         prompt = f"""
-        You are Cornelius, the arts critic. 
-        Task: Review the latest issue of our rival paper, 'The Cronulla Beige'.
-        Their Headline: "Local Man Considers Buying A Hat".
-        Your Review: Praise it as "High Art Minimalism." Use pretentious art-school jargon to describe how boring it is.
-        Tone: Snobbish, reserved, intellectual.
-        Format: HTML <article>...
+        Write an ARTS REVIEW.
+        You are Cornelius the Ibis. You review trash as if it were high art.
+        Today's subject: The {item_of_dispute} involved in the local neighborhood dispute.
+        
+        ALSO: Review a headline from 'The Cronulla Leader' (invent a boring one like 'Fence Painted Grey').
+        Call it a masterpiece of minimalism.
         """
-        return f"<article class='arts'><h2>The Lounge (Arts)</h2>{generate_text(prompt)}</article>"
+        content = self.generate_text(prompt)
+        return f"""
+        <div class="arts-section">
+            <h3 class="font-serif font-bold uppercase text-xl border-b border-black mb-2">The Lounge (Arts)</h3>
+            {content}
+        </div>
+        """
 
-class ZoomiesMenace:
-    """The Youth Voice."""
-    def write(self):
-        saga = load_json("saga.json")
+class ZoomiesKid(Writer):
+    def write_rant(self, saga_data):
         prompt = f"""
-        Write a short, chaotic paragraph from the perspective of a hyperactive puppy (The Zoomies Reporter).
-        Topic: The pile of rubbish at {saga['location']}.
-        Tone: Chaotic, all caps, distracted by smells, fast.
-        Format: HTML <p>...
+        Write a short, angry rant from a 'Youth on an E-Bike'.
+        Complain about the local dispute ({saga_data.get('details')}) blocking the footpath.
+        Use slang (Eshays, Brah, etc).
         """
-        return f"<article class='zoomies'><h2>ZOOMIES REPORT</h2>{generate_text(prompt)}</article>"
+        content = self.generate_text(prompt)
+        return f"""
+        <div class="zoomies-section border-l-4 border-red-600 pl-4 my-4">
+            <h4 class="font-sans font-black uppercase text-red-600">MENACE WATCH</h4>
+            {content}
+        </div>
+        """
 
-class MysticFifi:
-    """The Seance."""
-    def write(self):
-        prompt = "Channel the spirit of a historical pet (e.g., Napoleon's Pug) and give one piece of cryptic advice."
-        return f"<article class='mystic'><h2>Madame Fifi's Seance</h2>{generate_text(prompt)}</article>"
+class MadameFifi(Writer):
+    def write_seance(self):
+        prompt = f"""
+        You are Madame Fifi (Standard Poodle).
+        Channel the spirit of a Famous Historical Pet (e.g., Blondi, Checkers, Laika).
+        Write a 50-word message from them. Tone: Douglas Adams. Focus on smells/food, ignore historical gravity.
+        """
+        content = self.generate_text(prompt)
+        return f"""
+        <div class="seance-section bg-stone-200 p-4 mt-4">
+            <h4 class="font-gothic text-xl">The Seance</h4>
+            {content}
+        </div>
+        """
 
-# --- HELPER ---
-def generate_text(prompt):
-    if not GEMINI_API_KEY:
-        return "<p>[API Key Missing - Writer on Strike]</p>"
-    try:
-        response = model.generate_content(prompt)
-        # Strip markdown code blocks if present
-        clean = response.text.replace("```html", "").replace("```", "")
-        return clean
-    except Exception as e:
-        return f"<p>[Writer Blocked: {e}]</p>"
+# --- ASSET EMBEDDERS (No AI needed) ---
+def embed_image_section(filename, title, caption_text=""):
+    path = os.path.join("content", "images", filename)
+    # Check relative to where the script is RUN (root)
+    if os.path.exists(path):
+        return f"""
+        <div class="image-embed my-8 border-t-2 border-b-2 border-black py-4">
+            <h3 class="font-sans font-black uppercase text-2xl text-center mb-2">{title}</h3>
+            <img src="content/images/{filename}" class="w-full h-auto mx-auto shadow-lg">
+            <p class="text-center italic mt-2 text-sm">{caption_text}</p>
+        </div>
+        """
+    return ""  # Return empty if file missing
